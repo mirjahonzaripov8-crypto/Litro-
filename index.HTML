@@ -1,0 +1,2313 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AYQSH HISOBOT</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- ASOSIY SOZLAMALAR --- */
+        :root {
+            --radius: 16px;
+            --font: 'Inter', sans-serif;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 1. STANDART (TUN - DEFAULT) */
+        body {
+            --bg-body: #0f172a;
+            --bg-panel: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        /* 2. YORUG' (KUN) */
+        body.theme-light {
+            --bg-body: #f8fafc;
+            --bg-panel: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --primary: #3b82f6;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 3. OKEAN */
+        body.theme-ocean {
+            --bg-body: #082f49;
+            --bg-panel: #0c4a6e;
+            --text-main: #f0f9ff;
+            --text-muted: #7dd3fc;
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #38bdf8;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 4. MIDNIGHT */
+        body.theme-midnight {
+            --bg-body: #000000;
+            --bg-panel: #111111;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --primary: #a855f7;
+            --shadow: none;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background: var(--bg-body);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 25px 15px;
+            z-index: 50;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-btn {
+            padding: 14px 16px;
+            margin: 4px 0;
+            border: none;
+            border-radius: var(--radius);
+            background: transparent;
+            color: var(--text-muted);
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(128, 128, 128, 0.1);
+            color: var(--text-main);
+            transform: translateX(4px);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .footer-credit {
+            margin-top: auto;
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-muted);
+            opacity: 0.5;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            letter-spacing: 1px;
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+            padding-bottom: 80px;
+        }
+
+        .active-page {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        h2 {
+            margin: 0 0 20px 0;
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h3 {
+            margin: 0 0 15px 0;
+            font-size: 15px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* INPUTS */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: block;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-weight: 600;
+            font-family: var(--font);
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        input.readonly {
+            opacity: 0.6;
+            pointer-events: none;
+            background: rgba(128, 128, 128, 0.1);
+            border-style: dashed;
+        }
+
+        /* BUTTONS */
+        .btn-main {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 14px;
+            transition: 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+
+        .btn-outline {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 2px dashed var(--border);
+            color: var(--text-muted);
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(128, 128, 128, 0.05);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-check {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-check:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* TABLES */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            background: rgba(128, 128, 128, 0.05);
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        /* PLOMBA STYLES */
+        tr.verified td {
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        tr.unverified td {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* SWITCH TOGGLE */
+        .switch-box {
+            display: flex;
+            background: var(--bg-body);
+            padding: 4px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .switch-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .switch-btn.active.lock {
+            background: var(--danger);
+            color: white;
+        }
+
+        .switch-btn.active.unlock {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* TEXT STYLES */
+        .big-num {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 5px 0;
+            color: var(--text-main);
+            letter-spacing: -1px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        .bg-green {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .bg-red {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .bg-yellow {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        /* OVERLAYS */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--bg-panel);
+            width: 90%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            text-align: center;
+            transform: scale(0.95);
+            transition: 0.3s;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .overlay.show .modal {
+            transform: scale(1);
+        }
+
+        /* DRAGGABLE THEME BUTTON */
+        #drag_btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+            z-index: 2000;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            touch-action: none;
+            color: var(--text-main);
+            font-size: 22px;
+            transition: transform 0.1s;
+        }
+
+        #drag_btn:active {
+            cursor: grabbing;
+            transform: scale(0.9);
+        }
+
+        .theme-menu {
+            position: fixed;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 180px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1999;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            padding: 5px;
+        }
+
+        .theme-menu.show {
+            display: flex;
+            animation: fadeIn 0.2s;
+        }
+
+        .theme-opt {
+            padding: 12px 15px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            border-radius: 10px;
+            margin-bottom: 2px;
+        }
+
+        .theme-opt:hover {
+            background: rgba(128, 128, 128, 0.1);
+            color: var(--primary);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 75px;
+                flex-direction: row;
+                align-items: center;
+                overflow-x: auto;
+                padding: 10px;
+                order: 2;
+                border-right: none;
+                border-top: 1px solid var(--border);
+            }
+
+            .sidebar .logo,
+            .sidebar #user_display,
+            .footer-credit {
+                display: none;
+            }
+
+            .nav-btn {
+                flex-direction: column;
+                font-size: 10px;
+                padding: 8px;
+                min-width: 70px;
+                text-align: center;
+                gap: 6px;
+            }
+
+            .main {
+                order: 1;
+                padding: 15px;
+            }
+        }
+
+        .watermark {
+            margin-top: 20px;
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 800;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="drag_btn">🎨</div>
+    <div class="theme-menu" id="theme_menu">
+        <div class="theme-opt" onclick="setTheme('default')">🌙 Standart (Tun)</div>
+        <div class="theme-opt" onclick="setTheme('light')">☀️ Yorug' (Kun)</div>
+        <div class="theme-opt" onclick="setTheme('ocean')">🌊 Okean (Ko'k)</div>
+        <div class="theme-opt" onclick="setTheme('midnight')">🖤 Qop-qora</div>
+    </div>
+
+    <div class="overlay show" id="login_overlay">
+        <div class="modal">
+            <div class="logo">AYQSH PRO</div>
+            <p style="color:var(--text-muted); margin-bottom:25px; font-weight:500">Tizimga kirish</p>
+            <input type="text" id="login_u" placeholder="Login" style="margin-bottom:15px; text-align:center">
+            <input type="password" id="login_p" placeholder="Parol" style="margin-bottom:25px; text-align:center">
+            <button class="btn-main" onclick="auth()">KIRISH</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="branch_overlay">
+        <div class="modal">
+            <h2>FILIALNI TANLANG</h2>
+            <div style="display:grid; gap:15px; margin-top:25px">
+                <button class="btn-main"
+                    style="height:55px; background:var(--bg-body); border:1px solid var(--primary); color:var(--primary)"
+                    onclick="setBranch('BUXORO')">📍 BUXORO</button>
+                <button class="btn-main"
+                    style="height:55px; background:var(--bg-body); border:1px solid var(--primary); color:var(--primary)"
+                    onclick="setBranch('QORAKUL')">📍 QORAKUL</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="edit_overlay">
+        <div class="modal" style="max-width:450px; text-align:left">
+            <h2 style="color:var(--primary)">✏️ TAHRIRLASH</h2>
+            <input type="hidden" id="e_idx">
+            <div class="grid-2">
+                <div><label>Sana</label><input type="text" id="e_date" class="readonly" readonly></div>
+                <div><label>Mahsulot</label><input type="text" id="e_type" class="readonly" readonly></div>
+            </div>
+            <div class="grid-2" style="margin-top:15px">
+                <div><label>Boshlang'ich</label><input type="number" id="e_start" class="readonly" readonly></div>
+                <div><label>Sotilgan (L)</label><input type="number" id="e_sold" style="border-color:var(--warning)"
+                        oninput="recalcEdit()"></div>
+            </div>
+            <div class="grid-2" style="margin-top:15px">
+                <div><label>Yangi Oxirgi</label><input type="number" id="e_end" class="readonly" readonly
+                        style="font-weight:900; color:var(--primary)"></div>
+                <div><label>Narx</label><input type="number" id="e_price"></div>
+            </div>
+            <div style="margin-top:15px"><label>Xarajat Summasi</label><input type="number" id="e_exp"></div>
+            <button class="btn-main" onclick="saveEdit()">SAQLASH</button>
+            <button class="btn-outline" style="margin-top:10px"
+                onclick="document.getElementById('edit_overlay').classList.remove('show')">BEKOR</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="log_detail_overlay">
+        <div class="modal" style="text-align:left">
+            <h2>📄 BATAFSIL</h2>
+            <p id="log_detail_content"
+                style="white-space: pre-wrap; font-family: monospace; font-size:13px; color:var(--text-muted); background:var(--bg-body); padding:15px; border-radius:12px; border:1px solid var(--border)">
+            </p>
+            <button class="btn-outline" style="margin-top:15px"
+                onclick="document.getElementById('log_detail_overlay').classList.remove('show')">YOPISH</button>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="logo">AYQSH PRO</div>
+        <div id="user_display"
+            style="text-align:center; color:var(--text-muted); font-size:12px; margin-bottom:25px; font-weight:600">
+        </div>
+        <nav>
+            <button class="nav-btn active" onclick="showPage('home')">🏠 Bosh Sahifa</button>
+            <button class="nav-btn" onclick="showPage('meter')">🔢 Hisoblagich</button>
+            <button class="nav-btn" onclick="showPage('history')">📜 Tarix</button>
+            <button class="nav-btn" onclick="showPage('supply')">🚛 Ta'minot</button>
+            <button class="nav-btn" onclick="showPage('expenses')">💸 Xarajat</button>
+            <button class="nav-btn" onclick="showPage('archive')">📂 Arxiv</button>
+            <button class="nav-btn" onclick="showPage('finance')">💰 Moliya</button>
+            <button class="nav-btn" onclick="showPage('tasks')">✅ Vazifalar <span id="task_badge" class="badge"
+                    style="background:var(--danger); display:none">0</span></button>
+            <button class="nav-btn" onclick="checkSecurity(this)">🔐 Xavfsizlik</button>
+        </nav>
+        <div class="footer-credit">POWERED BY ZARIPOV</div>
+        <button class="nav-btn" style="color:var(--danger); margin-top:10px" onclick="logout()">⬅️ Chiqish</button>
+    </div>
+
+    <div class="main">
+
+        <div id="home" class="page active-page">
+            <h2>🏠 BOSH SAHIFA <span style="font-size:13px; opacity:0.6; font-weight:600; color:var(--text-muted)"
+                    id="br_title"></span></h2>
+
+            <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:20px"
+                id="stats_container"></div>
+
+            <div class="card" style="margin-top:25px">
+                <h2>📉 Oy bo'yicha sotuv grafikasi</h2>
+                <div style="height:280px; width:100%"><canvas id="mainChart"></canvas></div>
+            </div>
+        </div>
+
+        <div id="workers" class="page">
+            <h2>👥 XODIMLAR VA NAZORAT</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Yangi Ishchi Qo'shish</h3>
+                    <p style="font-size:11px; color:var(--warning); margin-bottom:10px">Faqat 1-Admin (Zaripov) qo'sha
+                        oladi.</p>
+                    <input type="text" id="w_login" placeholder="Login" style="margin-bottom:10px">
+                    <input type="text" id="w_pass" placeholder="Parol" style="margin-bottom:10px">
+                    <input type="text" id="w_name" placeholder="Tahallus (Masalan: Boss)" style="margin-bottom:10px">
+                    <button class="btn-main" onclick="addWorker()">QO'SHISH</button>
+
+                    <h3 style="margin-top:25px">Mavjud Ishchilar</h3>
+                    <div id="workers_list"
+                        style="max-height:300px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; padding:10px">
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Faollik Tarixi (Log)</h3>
+                    <div style="display:flex; gap:10px; margin-bottom:15px; align-items:flex-end">
+                        <div style="flex:1"><label>Dan</label><input type="date" id="log_from"></div>
+                        <div style="flex:1"><label>Gacha</label><input type="date" id="log_to"></div>
+                        <button class="btn-outline" style="width:auto" onclick="renderLogs()">QIDIRISH</button>
+                    </div>
+                    <div class="table-wrap" style="max-height:400px; overflow-y:auto">
+                        <table id="tbl_logs">
+                            <thead>
+                                <tr>
+                                    <th>Vaqt</th>
+                                    <th>Kim (Login)</th>
+                                    <th>Harakat</th>
+                                    <th>Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="plomba" class="page">
+            <h2>🔖 PLOMBA NAZORATI</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Yangi kiritish</h3>
+                    <input type="date" id="pl_date" style="margin-bottom:15px">
+                    <div id="pl_list"></div>
+                    <button class="btn-outline" onclick="addPlombaInput()" style="margin-bottom:10px">+ Raqam
+                        qo'shish</button>
+                    <button class="btn-main" onclick="savePlomba()">SAQLASH</button>
+                </div>
+                <div class="card">
+                    <h3>Tarix va Nazorat</h3>
+                    <div class="table-wrap" style="max-height:400px; overflow-y:auto">
+                        <table id="pl_table">
+                            <thead>
+                                <tr>
+                                    <th>Sana</th>
+                                    <th>Raqamlar</th>
+                                    <th>Holat</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="finance" class="page">
+            <h2>💰 MOLIYA VA TAHLIL</h2>
+            <div class="card">
+                <div class="grid-2" style="margin-bottom:20px">
+                    <div><label>Dan</label><input type="date" id="f_from" onchange="calcFin()"></div>
+                    <div><label>Gacha</label><input type="date" id="f_to" onchange="calcFin()"></div>
+                </div>
+                <div
+                    style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:15px; border-top:1px dashed var(--border); padding-top:20px">
+                    <div style="flex:1">
+                        <label>Tushum</label>
+                        <div class="big-num" style="color:var(--primary)" id="fin_rev">0</div>
+                    </div>
+                    <div style="flex:1">
+                        <label>Xarajatlar</label>
+                        <div class="big-num" style="color:var(--danger)" id="fin_exp">0</div>
+                    </div>
+                    <div style="flex:1">
+                        <label>SOF FOYDA</label>
+                        <div class="big-num" style="color:var(--accent)" id="fin_net">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Mahsulotlar foydasi</h3>
+                    <div style="height:220px"><canvas id="pieChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3>⚙️ Sozlamalar</h3>
+                    <div id="cost_inputs"></div>
+                    <label style="margin-top:15px">Doimiy oylik xarajat (Soliq, ijara, oylik)</label>
+                    <input type="number" id="fix_cost">
+                    <button class="btn-main" onclick="saveConf()">SAQLASH</button>
+                </div>
+            </div>
+            <button class="btn-main" onclick="calcFin()">HISOBLASH</button>
+            <button class="btn-outline" onclick="exportFinPDF()">📄 PDF YUKLASH</button>
+
+            <div class="grid-4" style="margin-top:20px">
+            </div>
+        </div>
+
+        <div id="expenses" class="page">
+            <h2>💸 XARAJATLAR</h2>
+            <div class="card">
+                <div style="display:flex; gap:15px; align-items:flex-end; flex-wrap:wrap">
+                    <div style="flex:1"><label>Dan</label><input type="date" id="ex_from"></div>
+                    <div style="flex:1"><label>Gacha</label><input type="date" id="ex_to"></div>
+                    <div style="flex:1.5"><label>Tur (Sabab)</label><select id="ex_cat">
+                            <option value="all">Barchasi</option>
+                        </select></div>
+                    <button class="btn-main" style="width:auto; margin:0; padding:14px 24px"
+                        onclick="renderExp()">QIDIRISH</button>
+                </div>
+            </div>
+            <div class="card">
+                <h3
+                    style="color:var(--danger); font-size:20px; font-weight:800; border-bottom:1px dashed var(--border); padding-bottom:15px; margin-bottom:15px">
+                    Jami: <span id="ex_total">0</span> so'm</h3>
+                <div class="table-wrap">
+                    <table id="tbl_exp">
+                        <thead>
+                            <tr>
+                                <th>Sana</th>
+                                <th>Sabab</th>
+                                <th>Summa</th>
+                                <th>Operator</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tasks" class="page">
+            <h2>📝 VAZIFALAR (MANAGER)</h2>
+            <div class="card">
+                <h3>Yangi Vazifa</h3>
+                <div style="display:flex; gap:10px">
+                    <input type="text" id="task_txt" placeholder="Vazifa matni...">
+                    <button class="btn-main" style="width:auto; margin:0; padding:12px 20px"
+                        onclick="addTask()">QO'SHISH</button>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Vazifalar Ro'yxati</h3>
+                <div id="task_list"></div>
+            </div>
+        </div>
+
+        <div id="meter" class="page">
+            <h2>⛽ KUNLIK HISOBLAGICH <span class="badge"
+                    style="background:var(--danger); color:white; display:none; font-size:12px"
+                    id="lock_status">BLOKLANGAN</span></h2>
+            <div class="card">
+                <div class="grid-2" style="margin-bottom:25px">
+                    <div><label>Sana</label><input type="date" id="m_date"></div>
+                    <div><label>Operator</label><select id="m_op"></select></div>
+                </div>
+                <div id="meter_inputs"
+                    style="display:grid; gap:20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))"></div>
+
+                <!-- PRIYOM SECTION -->
+                <div style="margin-top:30px; border-top:1px dashed var(--border); padding-top:25px">
+                    <h3 style="color:var(--accent); display:flex; justify-content:space-between; align-items:center">
+                        🚛 BENZOVOZ QABULI (PRIYOM)
+                        <button class="btn-outline" style="width:auto; padding:5px 10px; font-size:11px"
+                            onclick="togglePriyom()">YASHIRISH/KO'RSATISH</button>
+                    </h3>
+                    <div id="priyom_box"
+                        style="display:none; background:rgba(16,185,129,0.05); padding:15px; border-radius:12px; border:1px solid var(--accent)">
+                        <div class="grid-2">
+                            <div><label>Mahsulot</label><select id="p_type">
+                                    <option>AI-91</option>
+                                    <option>AI-92</option>
+                                    <option>DIZEL</option>
+                                    <option>PROPAN</option>
+                                </select></div>
+                            <div><label>Litr (Hujjatda)</label><input type="number" id="p_litr" placeholder="0"></div>
+                        </div>
+                        <div class="grid-2" style="margin-top:10px">
+                            <div><label>Mashina №</label><input type="text" id="p_truck"></div>
+                            <div><label>Haydovchi</label><input type="text" id="p_driver"></div>
+                        </div>
+                        <div class="grid-2" style="margin-top:10px">
+                            <div><label>Temp °C</label><input type="number" id="p_temp"></div>
+                            <div><label>Plomba №</label><input type="text" id="p_seal"></div>
+                        </div>
+                        <div class="grid-2" style="margin-top:10px">
+                            <div><label>Yo'l vaqti (Soat)</label><input type="number" id="p_time"
+                                    placeholder="Necha soat yurdi?"></div>
+                        </div>
+                        <p style="font-size:11px; color:var(--text-muted); margin-top:10px">* Tabiiy yo'qotish (Soatiga
+                            qarab) avtomatik hisoblanadi.</p>
+                        <button class="btn-main" style="background:var(--accent)" onclick="savePriyom()">YUKNI QABUL
+                            QILISH</button>
+                    </div>
+                </div>
+
+                <div style="margin-top:30px; border-top:1px dashed var(--border); padding-top:25px">
+                    <h3 style="color:var(--primary); font-size:15px">Qo'shimcha Xarajatlar</h3>
+                    <div id="day_exps"></div>
+                    <button class="btn-outline" style="margin-top:10px" onclick="addDayExp()">+ Xarajat
+                        qo'shish</button>
+                    <div style="margin-top:20px"><label>Terminal (UzCard/Humo)</label><input type="number" id="m_term"
+                            value="0"></div>
+                </div>
+                <button class="btn-main" style="margin-top:30px; padding:18px; font-size:16px"
+                    onclick="saveDay()">SAQLASH</button>
+            </div>
+        </div>
+
+        <div id="supply" class="page">
+            <h2>🚛 BENZOVOZ TARIXI</h2>
+            <div class="card">
+                <div class="grid-2" style="margin-bottom:15px">
+                    <div><label>Dan</label><input type="date" id="sup_from"></div>
+                    <div><label>Gacha</label><input type="date" id="sup_to"></div>
+                </div>
+                <button class="btn-main" onclick="renderSupply()">QIDIRISH</button>
+            </div>
+            <div class="card">
+                <div class="table-wrap">
+                    <table id="tbl_supply">
+                        <thead>
+                            <tr>
+                                <th>Sana</th>
+                                <th>Mahsulot</th>
+                                <th>Hujjat (L)</th>
+                                <th>Yo'qotish</th>
+                                <th>Sof (L)</th>
+                                <th>Mashina/Haydovchi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="history" class="page">
+            <h2>📜 AMALIYOTLAR TARIXI</h2>
+            <div class="card">
+                <div class="grid-2" style="margin-bottom:15px">
+                    <div><label>Dan</label><input type="date" id="hist_from"></div>
+                    <div><label>Gacha</label><input type="date" id="hist_to"></div>
+                </div>
+                <button class="btn-main" onclick="renderHistory()">QIDIRISH</button>
+            </div>
+            <div class="card">
+                <div class="table-wrap" style="max-height:600px; overflow-y:auto">
+                    <table id="tbl_history">
+                        <thead>
+                            <tr>
+                                <th>Vaqt</th>
+                                <th>Foydalanuvchi</th>
+                                <th>Harakat</th>
+                                <th>Batafsil</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="archive" class="page">
+            <h2>📁 ARXIV VA TARIX</h2>
+            <div class="card" style="display:flex; gap:15px; align-items:flex-end; flex-wrap:wrap">
+                <div style="flex:1"><label>Dan</label><input type="date" id="ar_from"></div>
+                <div style="flex:1"><label>Gacha</label><input type="date" id="ar_to"></div>
+                <button class="btn-main" style="width:auto; margin:0; padding:14px 24px"
+                    onclick="renderArch()">QIDIRISH</button>
+                <button class="btn-outline"
+                    style="width:auto; margin:0; color:var(--danger); border-color:var(--danger)"
+                    onclick="showPDFModal()">📄 PDF YUKLASH</button>
+            </div>
+
+            <!-- PDF MODAL -->
+            <div class="overlay" id="pdf_modal">
+                <div class="modal" style="max-width:300px">
+                    <h3>PDF SHAKLINI TANLANG</h3>
+                    <div style="display:flex; gap:15px; justify-content:center; margin-top:20px">
+                        <button class="btn-outline" onclick="exportPDF('portrait')"
+                            style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:15px">
+                            <span style="font-size:24px">📄</span>
+                            <span>TIK (Vertikal)</span>
+                        </button>
+                        <button class="btn-outline" onclick="exportPDF('landscape')"
+                            style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:15px">
+                            <span style="font-size:24px; transform:rotate(90deg)">📄</span>
+                            <span>YOTIQ (Horizontal)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="arch_summary">
+                <!-- Summary will be injected here -->
+            </div>
+
+            <div class="card" id="arch_expenses_box" style="display:none">
+                <h3>💸 Xarajatlar Tafsiloti</h3>
+                <div class="table-wrap" style="max-height:300px; overflow-y:auto">
+                    <table id="tbl_arch_exp">
+                        <thead>
+                            <tr>
+                                <th>Sana</th>
+                                <th>Sabab</th>
+                                <th>Summa</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="table-wrap">
+                    <table id="tbl_arch">
+                        <thead>
+                            <tr>
+                                <th>Sana</th>
+                                <th>Turi</th>
+                                <th>Sotuv</th>
+                                <th>Narx</th>
+                                <th>Jami</th>
+                                <th>Xarajat</th>
+                                <th>Qoldiq</th>
+                                <th>Amal</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin" class="page">
+            <h2>🔐 XAVFSIZLIK</h2>
+
+            <!-- SECURITY SECTION -->
+            <div class="card" style="max-width:550px">
+                <h3>🔐 XAVFSIZLIK SOZLAMALARI</h3>
+
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:15px">
+                    <div><b>Plomba Kiritish</b><br><label style="margin:0; text-transform:none">Plomba raqamlarini kiritish</label></div>
+                </div>
+
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:15px">
+                    <div><b>Ruxsatni Boshqarish</b><br><label style="margin:0; text-transform:none">Kiritishni cheklash</label></div>
+                    <div class="switch-box">
+                        <button id="l_pl_on" class="switch-btn" onclick="togLock('plomba', true)">OFF</button>
+                        <button id="l_pl_off" class="switch-btn" onclick="togLock('plomba', false)">ON</button>
+                    </div>
+                </div>
+
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:15px">
+                    <div><b>Boshlang'ich Raqam</b><br><label
+                            style="margin:0; text-transform:none">Hisoblagichning boshlang'ich qiymati</label></div>
+                </div>
+
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:15px">
+                    <div><b>O'zgartirishni Taqiqlash</b><br><label style="margin:0; text-transform:none">Kiritilgan ma'lumotlarni tahrirlashni cheklash</label></div>
+                    <div class="switch-box">
+                        <button id="l_st_on" class="switch-btn" onclick="togLock('start', true)">OFF</button>
+                        <button id="l_st_off" class="switch-btn" onclick="togLock('start', false)">ON</button>
+                    </div>
+                </div>
+
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:15px">
+                    <div><b>Asosiy Kiritish</b><br><label style="margin:0; text-transform:none">Asosiy hisoblagich kiritish</label></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+                    <div><b>Kunlik Hisobotni Yopish</b><br><label style="margin:0; text-transform:none">Kunlik kiritishlarni taqiqlash</label></div>
+                    <div class="switch-box">
+                        <button id="l_mn_on" class="switch-btn" onclick="togLock('main', true)">OFF</button>
+                        <button id="l_mn_off" class="switch-btn" onclick="togLock('main', false)">ON</button>
+                    </div>
+                </div>
+
+                <h3 style="font-size:15px; margin-bottom:15px">Operatorlarni Tahrirlash</h3>
+                <div class="grid-2">
+                    <input type="text" id="op1_val">
+                    <input type="text" id="op2_val">
+                </div>
+                <button class="btn-outline" style="margin-top:15px" onclick="saveOps()">OPERATORLARNI SAQLASH</button>
+            </div>
+
+            <!-- DATABASE SECTION -->
+            <div class="card" style="max-width:550px">
+                <h3>💾 MA'LUMOTLAR BAZASI</h3>
+                <div class="grid-2">
+                    <button class="btn-main" style="margin:0; background:var(--accent)" onclick="backupDB()">YUKLAB OLISH (ZAXIRALASH)</button>
+                    <button class="btn-main" style="margin:0; background:var(--warning)"
+                        onclick="document.getElementById('imp_file').click()">TIKLASH</button>
+                    <input type="file" id="imp_file" style="display:none" onchange="restoreDB(this)">
+                </div>
+
+                <button class="btn-main" style="background:var(--danger); margin-top:40px; padding:18px"
+                    onclick="sysReset()">⚠️ TIZIMNI TO'LIQ TOZALASH</button>
+            </div>
+
+            <!-- PISTOL LIMITS (Funktsiya uchun saqlanagan) -->
+            <div class="card" style="max-width:550px">
+                <h3 style="font-size:15px; margin-bottom:15px">⚙️ Pistol (Paichalar) Limitlari</h3>
+                <div id="pistol_limits_div"></div>
+                <button class="btn-outline" style="margin-top:10px" onclick="savePistolLimits()">LIMITLARNI SAQLASH</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DRAG MANTIGI ---
+        const dragBtn = document.getElementById("drag_btn");
+        const menu = document.getElementById("theme_menu");
+        let isDragging = false;
+
+        function dragStart(e) {
+            isDragging = false;
+            const touch = e.touches ? e.touches[0] : e;
+            let shiftX = touch.clientX - dragBtn.getBoundingClientRect().left;
+            let shiftY = touch.clientY - dragBtn.getBoundingClientRect().top;
+
+            function moveAt(pageX, pageY) {
+                isDragging = true;
+                dragBtn.style.left = pageX - shiftX + 'px';
+                dragBtn.style.top = pageY - shiftY + 'px';
+                menu.style.left = (pageX - shiftX - 140) + 'px';
+                menu.style.top = (pageY - shiftY + 50) + 'px';
+            }
+
+            function onMouseMove(event) {
+                const moveTouch = event.touches ? event.touches[0] : event;
+                moveAt(moveTouch.clientX, moveTouch.clientY);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('touchmove', onMouseMove, { passive: false });
+
+            function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('touchmove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                document.removeEventListener('touchend', onMouseUp);
+            }
+            document.addEventListener('mouseup', onMouseUp);
+            document.addEventListener('touchend', onMouseUp);
+        }
+
+        dragBtn.addEventListener('mousedown', dragStart);
+        dragBtn.addEventListener('touchstart', dragStart, { passive: false });
+
+        dragBtn.onclick = function () {
+            if (!isDragging) {
+                const rect = dragBtn.getBoundingClientRect();
+                menu.style.top = (rect.bottom + 10) + "px";
+                menu.style.left = (rect.left - 130) + "px";
+                menu.classList.toggle('show');
+            }
+        };
+
+        // --- MA'LUMOTNOMALAR ---
+        let DB = { users: [], data: [], logs: [], locks: { plomba: false, start: false, main: false }, ops: { op1: 0, op2: 0 }, conf: { prices: {}, rates: {}, fix: 0, tax: 28 }, pistol_limits: {}, pistol_usage: {} };
+        let currentUser = null; const charts = {};
+
+        function init() {
+            const d = localStorage.getItem('ayqsh_db_v3');
+            if (d) { DB = JSON.parse(d); if (!DB.logs) DB.logs = []; if (!DB.conf) DB.conf = { prices: {}, rates: {}, fix: 0, tax: 28 }; if (!DB.pistol_limits) DB.pistol_limits = {}; if (!DB.pistol_usage) DB.pistol_usage = {}; }
+
+            // Zaxiralashni qayta tiklash
+            const restore = localStorage.getItem('ayqsh_restore');
+            if (restore) { DB = JSON.parse(restore); localStorage.removeItem('ayqsh_restore'); saveData(); alert("Tizim tiklandi!"); }
+
+            renderHome();
+            setTheme(localStorage.getItem('theme') || 'default');
+            setInterval(() => setTheme(localStorage.getItem('theme') || 'default'), 60000); // Har daqiqa tekshir
+
+            // Boshlang'ich soliq agar yo'q
+            if (DB.conf.tax === undefined) DB.conf.tax = 28;
+        }
+        let editId = -1;
+
+        // --- INIT JARAYONI ---
+        window.onload = () => {
+            // Filigrani qo'sh
+            document.querySelectorAll('.page').forEach(p => p.insertAdjacentHTML('beforeend', '<div class="watermark">POWERED BY ZARIPOV</div>'));
+
+            applyTheme();
+            const d = new Date().toISOString().split('T')[0];
+            ['m_date', 'f_from', 'f_to', 'ar_from', 'ar_to', 'ex_from', 'ex_to', 'log_from', 'log_to', 'sup_from', 'sup_to', 'hist_from', 'hist_to'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = d;
+            });
+
+            // Tungi vaqt tekshiruvi (19:00+)
+            const hr = new Date().getHours();
+            if (hr >= 19 || hr < 7) setTheme('midnight');
+
+            // Boshlang'ich adminlarni o'rnatish agar bo'sh
+            const savedUsers = JSON.parse(localStorage.getItem('users'));
+            if (!savedUsers || savedUsers.length === 0) {
+                DB.users = [
+                    { u: 'ZARIPOV', p: '20113', name: 'Admin 1', role: 'admin' },
+                    { u: 'ISKANDAR', p: '198622', name: 'BOSS', role: 'admin' }
+                ];
+                localStorage.setItem('users', JSON.stringify(DB.users));
+            } else {
+                DB.users = savedUsers;
+            }
+            DB.logs = JSON.parse(localStorage.getItem('logs')) || [];
+
+            // Sessiya tekshiruvi
+            const sessUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (sessUser) {
+                currentUser = sessUser;
+                document.getElementById('login_overlay').classList.remove('show');
+                document.getElementById('branch_overlay').classList.add('show');
+                document.getElementById('user_display').innerText = "👤 " + currentUser.name;
+            }
+        };
+
+        function setTheme(t) {
+            document.body.className = '';
+            if (t !== 'default') document.body.classList.add('theme-' + t);
+            localStorage.setItem('theme', t);
+            document.getElementById('theme_menu').classList.remove('show');
+            renderCharts();
+        }
+        function applyTheme() { setTheme(localStorage.getItem('theme') || 'default'); }
+
+        // --- KAYDLASH TIZIMI ---
+        function logAction(act, det) {
+            const now = new Date();
+            const rec = {
+                dateStr: now.toISOString().split('T')[0], // Filtrlash uchun
+                time: now.toLocaleString('uz-UZ'),
+                user: currentUser ? currentUser.u : 'Tizim',
+                action: act,
+                details: det
+            };
+            DB.logs.unshift(rec);
+            if (DB.logs.length > 500) DB.logs.pop();
+            localStorage.setItem('logs', JSON.stringify(DB.logs));
+            renderLogs();
+        }
+
+        // --- AUTENTIFIKATSIYA ---
+        function auth() {
+            const u = document.getElementById('login_u').value.toUpperCase();
+            const p = document.getElementById('login_p').value;
+            const user = DB.users.find(x => x.u === u && x.p === p);
+
+            if (user) {
+                currentUser = user;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                document.getElementById('login_overlay').classList.remove('show');
+                document.getElementById('branch_overlay').classList.add('show');
+                document.getElementById('user_display').innerText = "👤 " + user.name;
+                logAction("Kirish", `${u} tizimga kirdi`);
+            } else { alert("Login yoki parol noto'g'ri!"); }
+        }
+
+        function logout() {
+            if (currentUser) logAction("Chiqish", `${currentUser.u} tizimdan chiqdi`);
+            sessionStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        function setBranch(b) {
+            DB.branch = b;
+            document.getElementById('branch_overlay').classList.remove('show');
+            document.getElementById('br_title').innerText = "📍 " + b;
+            loadData(); renderUI();
+        }
+
+        function loadData() {
+            const b = DB.branch;
+            DB.data = JSON.parse(localStorage.getItem(`db_${b}`)) || [];
+            DB.data = JSON.parse(localStorage.getItem(`db_${b}`)) || [];
+            DB.plomba = JSON.parse(localStorage.getItem(`pl_${b}`)) || [];
+            DB.tasks = JSON.parse(localStorage.getItem(`tasks_${b}`)) || [];
+            DB.pistol_limits = JSON.parse(localStorage.getItem(`plim_${b}`)) || { "AI-91": 10000, "AI-92": 10000, "DIZEL": 10000, "PROPAN": 10000 };
+            DB.pistol_usage = JSON.parse(localStorage.getItem(`pusg_${b}`)) || { "AI-91": 0, "AI-92": 0, "DIZEL": 0, "PROPAN": 0 };
+            DB.ops = JSON.parse(localStorage.getItem(`ops_${b}`)) || { op1: 'Op 1', op2: 'Op 2' };
+            DB.locks = JSON.parse(localStorage.getItem(`locks`)) || { plomba: false, start: false, main: false };
+            DB.conf = JSON.parse(localStorage.getItem(`conf`)) || { prices: { "AI-91": 0, "AI-92": 0, "DIZEL": 0, "PROPAN": 0 }, fix: 0 };
+            DB.all.BUXORO = JSON.parse(localStorage.getItem(`db_BUXORO`)) || [];
+            DB.all.QORAKUL = JSON.parse(localStorage.getItem(`db_QORAKUL`)) || [];
+        }
+        function saveData() {
+            const b = DB.branch;
+            localStorage.setItem(`db_${b}`, JSON.stringify(DB.data));
+            localStorage.setItem(`db_${b}`, JSON.stringify(DB.data));
+            localStorage.setItem(`pl_${b}`, JSON.stringify(DB.plomba));
+            localStorage.setItem(`tasks_${b}`, JSON.stringify(DB.tasks));
+            localStorage.setItem(`plim_${b}`, JSON.stringify(DB.pistol_limits));
+            localStorage.setItem(`pusg_${b}`, JSON.stringify(DB.pistol_usage));
+            localStorage.setItem(`ops_${b}`, JSON.stringify(DB.ops));
+            localStorage.setItem(`locks`, JSON.stringify(DB.locks));
+            localStorage.setItem(`conf`, JSON.stringify(DB.conf));
+            DB.all[b] = DB.data;
+        }
+
+        // --- NAVIGATSIYA ---
+        // --- NAVIGATSIYA ---
+        function showPage(pg) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.getElementById(pg).classList.add('active-page');
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('active');
+                if (b.getAttribute('onclick').includes(`'${pg}'`)) b.classList.add('active');
+            });
+
+            if (pg === 'home') renderHome();
+            if (pg === 'finance') { initConf(); calcFin(); }
+            if (pg === 'expenses') { initExp(); renderExp(); }
+            if (pg === 'meter') initMeter();
+            if (pg === 'archive') renderArch();
+            if (pg === 'admin') renderAdmin();
+            if (pg === 'workers') renderWorkersPage();
+            if (pg === 'tasks') renderTasks();
+            if (pg === 'plomba') renderPlombaTable();
+            if (pg === 'supply') renderSupply();
+            if (pg === 'history') renderHistory();
+        }
+        function renderUI() { showPage('home'); }
+
+        function checkSecurity(btn) {
+            const pass = prompt("Xavfsizlik bo'limi uchun maxsus parol:");
+            if (pass === "ZARIPOV2011$") showPage('admin');
+            else alert("Parol noto'g'ri!");
+        }
+
+        // --- BOSH SAHIFA (YANGILANGAN TARTIB) ---
+        function renderHome() {
+            const fuels = DB.branch === 'BUXORO' ? ["AI-91", "AI-92", "DIZEL"] : ["AI-91", "AI-92", "DIZEL", "PROPAN"];
+            const cont = document.getElementById('stats_container'); cont.innerHTML = '';
+            const now = new Date();
+            const startM = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+
+            fuels.forEach(f => {
+                const hist = DB.data.filter(r => r.type === f);
+                const ost = hist.length ? hist[hist.length - 1].ost : 0;
+            const soldRecs = hist.filter(r => r.date >= startM && !r.isPriyom);
+                const mSold = soldRecs.reduce((a, b) => a + (b.sold || 0), 0);
+
+                let daysDiv = 1;
+                if (soldRecs.length > 0) {
+                    const lastDateStr = soldRecs[soldRecs.length - 1].date;
+                    const lastDay = parseInt(lastDateStr.split('-')[2]);
+                    daysDiv = lastDay || 1;
+                } else {
+                    daysDiv = now.getDate() || 1;
+                }
+                const avg = Math.round(mSold / daysDiv);
+
+            // Qoldiq rangini o'rnatish
+            if (f === 'PROPAN') { if (ost < 7000) col = 'var(--danger)'; else if (ost < 13000) col = 'var(--warning)'; else col = 'var(--accent)'; }
+            else { if (ost < 2000) col = 'var(--danger)'; else if (ost < 5000) col = 'var(--warning)'; else col = 'var(--accent)'; }
+
+                cont.innerHTML += `
+            <div class="card" style="border-top:4px solid ${col}; position:relative; overflow:hidden">
+                <div style="position:absolute; right:-20px; top:-20px; font-size:120px; opacity:0.04; color:${col}">⛽</div>
+                <div style="position:relative; z-index:2">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+                        <b style="font-size:18px; color:var(--text-main); letter-spacing:0.5px">${f}</b>
+                        <span style="background:rgba(128,128,128,0.1); color:${col}; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:800;">ZAXIRA</span>
+                    </div>
+                    
+                    <div class="big-num" style="color:${col}; margin-bottom:15px">${ost.toLocaleString()} <span style="font-size:16px; opacity:0.7">L</span></div>
+                    
+                    <div style="display:flex; justify-content:space-between; padding-top:12px; border-top:1px dashed var(--border); font-size:13px; color:var(--text-muted)">
+                        <span>Kunlik o'rtacha:</span>
+                        <b style="color:var(--text-main)">${avg.toLocaleString()} L</b>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; padding-top:8px; font-size:13px; color:var(--text-muted)">
+                        <span>Oy boshidan:</span>
+                        <b style="color:var(--text-main)">${mSold.toLocaleString()} L</b>
+                    </div>
+                </div>
+            </div>`;
+            });
+
+            // Pistol Ogolanmalari
+            fuels.forEach(f => {
+                const l = DB.pistol_limits[f] || 10000;
+                const u = DB.pistol_usage[f] || 0;
+                const rem = l - u;
+                if (rem < 500) {
+                    cont.innerHTML = `<div class="ai-alert alert-danger" style="width:100%; margin-bottom:15px; background:rgba(239, 68, 68, 0.1); padding:15px; border-radius:12px; color:var(--danger); border:1px solid var(--danger)">⚠️ DIQQAT! ${f} pistoleti filtri to'lmoqda! Qoldiq resurs: ${rem} litr.</div>` + cont.innerHTML;
+                }
+            });
+
+            renderCharts();
+        }
+
+        function renderCharts() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if (charts.main) charts.main.destroy();
+            const labels = [], data = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(); d.setDate(d.getDate() - i); const s = d.toISOString().split('T')[0];
+                labels.push(s.slice(5));
+                data.push(DB.data.filter(r => r.date === s).reduce((a, b) => a + (b.sold || 0), 0));
+            }
+            const isDark = !document.body.classList.contains('theme-light');
+            const col = isDark ? '#ffffff' : '#333333';
+            const primary = getComputedStyle(document.body).getPropertyValue('--primary').trim() || '#6366f1';
+
+            charts.main = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets: [{ label: 'Sotuv (L)', data, borderColor: primary, backgroundColor: 'rgba(128,128,128,0.1)', fill: true, tension: 0.4, borderWidth: 3 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: col } }, y: { ticks: { color: col } } } }
+            });
+        }
+
+        // --- ISHCHILAR (YANGI LOGIKALAR) ---
+        function renderWorkersPage() {
+            renderWorkersList();
+            renderLogs();
+        }
+
+        function addWorker() {
+            if (currentUser.u !== 'ZARIPOV') return alert("Faqat Bosh Admin (Zaripov) qo'shishi mumkin!");
+
+            const u = document.getElementById('w_login').value.toUpperCase();
+            const p = document.getElementById('w_pass').value;
+            const n = document.getElementById('w_name').value;
+
+            if (!u || !p || !n) return alert("Hamma maydonlarni to'ldiring!");
+            if (DB.users.find(x => x.u === u)) return alert("Bu login band!");
+
+            DB.users.push({ u, p, name: n, role: 'worker' });
+            localStorage.setItem('users', JSON.stringify(DB.users));
+
+            document.getElementById('w_login').value = '';
+            document.getElementById('w_pass').value = '';
+            document.getElementById('w_name').value = '';
+
+            renderWorkersList();
+            logAction("Ishchi qo'shdi", `Yangi: ${n} (${u})`);
+            alert("Ishchi qo'shildi!");
+        }
+
+        function deleteWorker(u) {
+            if (currentUser.u !== 'ZARIPOV') return alert("Faqat Bosh Admin (Zaripov) o'chira oladi!");
+            if (u === 'ZARIPOV' || u === 'ISKANDAR') return alert("Adminlarni o'chirib bo'lmaydi!");
+
+            if (confirm("Ushbu ishchini o'chirmoqchimisiz? U tizimga qayta kira olmaydi.")) {
+                DB.users = DB.users.filter(x => x.u !== u);
+                localStorage.setItem('users', JSON.stringify(DB.users));
+                renderWorkersList();
+                logAction("Ishchi o'chirdi", `Login: ${u}`);
+            }
+        }
+
+        function renderWorkersList() {
+            const div = document.getElementById('workers_list');
+            div.innerHTML = '';
+            const isSuper = currentUser && currentUser.u === 'ZARIPOV';
+
+            DB.users.forEach(u => {
+                // Parol faqat Zaripovga ko'rinadi
+                const showPass = isSuper ? u.p : '***';
+
+                // Delete button logic: Only ZARIPOV sees it, and cannot delete admins
+                let delBtn = '';
+                if (isSuper && u.role !== 'admin') {
+                    delBtn = `<button class="btn-danger" onclick="deleteWorker('${u.u}')">O'chirish</button>`;
+                } else if (u.role === 'admin') {
+                    delBtn = '<span class="badge" style="background:var(--accent); color:white">ADMIN</span>';
+                } else if (!isSuper) {
+                    // If not Zaripov, hide delete button for workers too, or just show badge
+                    delBtn = '<span class="badge" style="background:var(--border)">ISHCHI</span>';
+                }
+
+                div.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid var(--border)">
+                <div>
+                    <div style="font-weight:700; font-size:14px; margin-bottom:2px">${u.name}</div> 
+                    <div style="font-size:11px; color:var(--text-muted)">Login: ${u.u} | Parol: <span style="font-family:monospace; color:var(--primary)">${showPass}</span></div>
+                </div>
+                <div>${delBtn}</div>
+            </div>`;
+            });
+        }
+
+        function renderLogs() {
+            const from = document.getElementById('log_from').value;
+            const to = document.getElementById('log_to').value;
+
+            const tbody = document.querySelector('#tbl_logs tbody');
+            tbody.innerHTML = '';
+
+            const filteredLogs = DB.logs.filter(l => {
+                if (!l.dateStr) return true; // Eski loglar qolsin
+                return l.dateStr >= from && l.dateStr <= to;
+            });
+
+            filteredLogs.forEach((l, i) => {
+                tbody.innerHTML += `
+            <tr>
+                <td style="font-size:11px; color:var(--text-muted)">${l.time}</td>
+                <td><b>${l.user}</b></td>
+                <td>${l.action}</td>
+                <td><button class="btn-outline" style="padding:4px 10px; font-size:11px" onclick="viewLogDetail(${i})">Batafsil</button></td>
+            </tr>`;
+            });
+        }
+
+        function viewLogDetail(i) {
+            const from = document.getElementById('log_from').value;
+            const to = document.getElementById('log_to').value;
+            const filteredLogs = DB.logs.filter(l => (!l.dateStr) || (l.dateStr >= from && l.dateStr <= to));
+
+            document.getElementById('log_detail_content').innerText = filteredLogs[i].details;
+            document.getElementById('log_detail_overlay').classList.add('show');
+        }
+
+        // --- PLOMBA KIRITISH ---
+        function addPlombaInput() { document.getElementById('pl_list').insertAdjacentHTML('beforeend', '<input type="text" class="pl-val" placeholder="Raqam" style="margin-top:5px">'); }
+
+        function savePlomba() {
+            if (DB.locks.plomba) { alert("Bloklangan!"); return; }
+            const arr = Array.from(document.querySelectorAll('.pl-val')).map(i => i.value).filter(i => i);
+            if (arr.length) {
+                // Auto Verify Logic: Check if same as previous
+                let autoVerify = false;
+                // Sort to handle order difference (e.g. 1,2 vs 2,1)
+                const currentStr = arr.slice().sort().join(',');
+
+                // Get last record (which is first in sorted DB.plomba usually, but we sort in render. Let's find latest by date)
+                const latest = DB.plomba.slice().sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+                if (latest) {
+                    const latestStr = latest.list.slice().sort().join(',');
+                    if (currentStr === latestStr) autoVerify = true;
+                }
+
+                DB.plomba.unshift({
+                    date: document.getElementById('pl_date').value,
+                    count: arr.length,
+                    list: arr,
+                    verified: autoVerify
+                });
+
+                saveData();
+                logAction("Plomba", `Kiritdi: ${arr.join(', ')} (${autoVerify ? 'Avto' : 'Kutilmoqda'})`);
+                alert("Saqlandi!");
+                renderPlombaTable();
+            }
+        }
+
+        function renderPlombaTable() {
+            const tbody = document.querySelector('#pl_table tbody');
+            tbody.innerHTML = '';
+
+            DB.plomba.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            DB.plomba.forEach((curr, i) => {
+                let statusHTML = '';
+                let rowClass = '';
+
+                if (curr.verified) {
+                    statusHTML = '<span class="badge bg-green">TASDIQLANGAN</span>';
+                    rowClass = 'verified';
+                } else {
+                    statusHTML = `<button class="btn-check" onclick="verifyPlomba(${i})">✅ TASDIQLASH</button>`;
+                    rowClass = 'unverified';
+                }
+
+                tbody.innerHTML += `
+            <tr class="${rowClass}">
+                <td>${curr.date}</td>
+                <td>${curr.list.join(', ')}</td>
+                <td>${statusHTML}</td>
+            </tr>`;
+            });
+        }
+
+        function verifyPlomba(i) {
+            const pass = prompt("Tasdiqlash uchun 1-Admin (Zaripov) parolini kiriting:");
+            if (pass === "20113") {
+                DB.plomba[i].verified = true;
+                saveData();
+                logAction("Plomba Tasdiq", `${DB.plomba[i].date} sanadagi plomba tasdiqlandi`);
+                renderPlombaTable();
+            } else {
+                alert("Parol noto'g'ri!");
+            }
+        }
+
+        // --- METER LOGIC WITH INITIAL SETUP ---
+        function initMeter() {
+            const fuels = DB.branch === 'BUXORO' ? ["AI-91", "AI-92", "DIZEL"] : ["AI-91", "AI-92", "DIZEL", "PROPAN"];
+            const cont = document.getElementById('meter_inputs'); cont.innerHTML = '';
+            document.getElementById('m_op').innerHTML = `<option>${DB.ops.op1}</option><option>${DB.ops.op2}</option>`;
+            const lk = DB.locks.start ? 'readonly' : '';
+            document.getElementById('lock_status').style.display = DB.locks.main ? 'inline-block' : 'none';
+
+            fuels.forEach(f => {
+                const hist = DB.data.filter(r => r.type === f);
+                const hasData = hist.length > 0;
+                const last = hasData ? hist[hist.length - 1] : { end: 0, end1: 0, end2: 0 };
+
+                const isDual = (DB.branch === 'QORAKUL' && f === 'PROPAN') || DB.branch === 'BUXORO';
+
+                let cardHTML = '';
+
+                if (isDual) {
+                    if (!hasData) {
+                        // FIRST TIME SETUP
+                        cardHTML = `
+                    <div class="card" data-f="${f}" data-d="1" data-init="true">
+                        <h3 style="color:var(--warning)">${f} <small>(Boshlang'ich Sozlash)</small></h3>
+                        <div class="grid-2">
+                            <div><label>1-Boshlash</label><input type="number" class="s1" placeholder="Kiritish"></div>
+                            <div><label>1-Yakunlash</label><input type="number" class="e1" placeholder="Kiritish"></div>
+                        </div>
+                        <div class="grid-2" style="margin-top:10px">
+                            <div><label>2-Boshlash</label><input type="number" class="s2" placeholder="Kiritish"></div>
+                            <div><label>2-Yakunlash</label><input type="number" class="e2" placeholder="Kiritish"></div>
+                        </div>
+                        <div style="margin-top:15px; border-top:1px dashed var(--border); padding-top:10px">
+                            <label style="color:var(--accent)">BOSHLANG'ICH ZAXIRA</label>
+                            <input type="number" class="pr" placeholder="Bakda qancha bor?">
+                        </div>
+                        <div class="grid-2" style="margin-top:10px">
+                            <div><label>Narx</label><input type="number" class="pc"></div>
+                        </div>
+                    </div>`;
+                    } else {
+                        // REGULAR
+                        cardHTML = `
+                    <div class="card" data-f="${f}" data-d="1" data-init="false">
+                        <h3 style="color:var(--primary)">${f} <small>(2 ta)</small></h3>
+                        <div class="grid-2">
+                            <div><label>1-Boshlash</label><input type="number" class="s1 readonly" value="${last.end1}" readonly></div>
+                            <div><label>1-Yakunlash</label><input type="number" class="e1 live" oninput="calcL('${f}')"></div>
+                        </div>
+                        <div class="grid-2" style="margin-top:10px">
+                            <div><label>2-Boshlash</label><input type="number" class="s2 readonly" value="${last.end2}" readonly></div>
+                            <div><label>2-Yakunlash</label><input type="number" class="e2 live" oninput="calcL('${f}')"></div>
+                        </div>
+                        <div style="text-align:right; margin:10px 0; font-weight:800; color:var(--accent)" id="L_${f}">Jami: 0 L</div>
+                        <div class="grid-2">
+                            <div><label>Yangi Keltirilgan (L)</label><input type="number" class="pr" value="0"></div>
+                            <div><label>Narx</label><input type="number" class="pc"></div>
+                        </div>
+                    </div>`;
+                    }
+                } else {
+                    if (!hasData) {
+                        // FIRST TIME SETUP
+                        cardHTML = `
+                    <div class="card" data-f="${f}" data-d="0" data-init="true">
+                        <h3 style="color:var(--warning)">${f} <small>(Boshlang'ich Sozlash)</small></h3>
+                        <div class="grid-2">
+                            <div><label>Boshlash</label><input type="number" class="s1" placeholder="Kiritish"></div>
+                            <div><label>Yakunlash</label><input type="number" class="e1" placeholder="Kiritish"></div>
+                        </div>
+                        <div style="margin-top:15px; border-top:1px dashed var(--border); padding-top:10px">
+                            <label style="color:var(--accent)">BOSHLANG'ICH ZAXIRA</label>
+                            <input type="number" class="pr" placeholder="Bakda qancha bor?">
+                        </div>
+                        <div class="grid-2" style="margin-top:10px">
+                            <div><label>Narx</label><input type="number" class="pc"></div>
+                        </div>
+                    </div>`;
+                    } else {
+                        // REGULAR
+                        cardHTML = `
+                    <div class="card" data-f="${f}" data-d="0" data-init="false">
+                        <h3 style="color:var(--primary)">${f}</h3>
+                        <div class="grid-2">
+                            <div><label>Boshlash</label><input type="number" class="s1 readonly" value="${last.end}" readonly></div>
+                            <div><label>Yakunlash</label><input type="number" class="e1 live" oninput="calcL('${f}')"></div>
+                        </div>
+                        <div style="text-align:right; margin:10px 0; font-weight:800; color:var(--accent)" id="L_${f}">Jami: 0 L</div>
+                        <div class="grid-2">
+                            <div><label>Yangi Keltirilgan (L)</label><input type="number" class="pr" value="0"></div>
+                            <div><label>Narx</label><input type="number" class="pc"></div>
+                        </div>
+                    </div>`;
+                    }
+                }
+                cont.innerHTML += cardHTML;
+            });
+        }
+
+        function calcL(f) {
+            const c = document.querySelector(`.card[data-f="${f}"]`);
+            const isD = c.dataset.d === "1";
+            // Faqat oddiy kunlar uchun hisoblash, init kunlarida qo'lda kiriting
+            if (c.dataset.init === "true") return;
+
+            const s1 = parseFloat(c.querySelector('.s1').value) || 0;
+            const e1 = parseFloat(c.querySelector('.e1').value) || 0;
+            let sold = Math.max(0, e1 - s1);
+            if (isD) {
+                const s2 = parseFloat(c.querySelector('.s2').value) || 0;
+                const e2 = parseFloat(c.querySelector('.e2').value) || 0;
+                sold += Math.max(0, e2 - s2);
+            }
+            document.getElementById(`L_${f}`).innerText = (isD ? "Jami: " : "Sotildi: ") + sold.toLocaleString() + " L";
+        }
+
+        function addDayExp() { document.getElementById('day_exps').insertAdjacentHTML('beforeend', `<div class="grid-2" style="margin-top:5px"><input type="number" class="ds" placeholder="Sum"><input type="text" class="dw" placeholder="Sabab"></div>`); }
+
+        function saveDay() {
+            if (DB.locks.main) return alert("Bloklangan!");
+            const d = document.getElementById('m_date').value;
+            const op = document.getElementById('m_op').value;
+            const tr = parseFloat(document.getElementById('m_term').value) || 0;
+            const ex = [];
+            document.querySelectorAll('#day_exps .grid-2').forEach(r => {
+                const s = parseFloat(r.querySelector('.ds').value) || 0;
+                const w = r.querySelector('.dw').value;
+                if (s > 0) ex.push({ sum: s, why: w });
+            });
+
+            let saved = false;
+            let logDetail = `Sana: ${d}, Op: ${op}\n`;
+
+            document.querySelectorAll('#meter_inputs .card').forEach(c => {
+                const f = c.dataset.f;
+                const isD = c.dataset.d === "1";
+                const isInit = c.dataset.init === "true";
+
+                const pr = parseFloat(c.querySelector('.pr').value) || 0;
+                const pc = parseFloat(c.querySelector('.pc').value) || 0;
+
+                const hist = DB.data.filter(r => r.type === f);
+
+                // Logic Split
+                let sold = 0, rec = {}, s1 = 0, e1 = 0, s2 = 0, e2 = 0, ost = 0;
+
+                if (isD) {
+                    s1 = parseFloat(c.querySelector('.s1').value) || 0; e1 = parseFloat(c.querySelector('.e1').value) || 0;
+                    s2 = parseFloat(c.querySelector('.s2').value) || 0; e2 = parseFloat(c.querySelector('.e2').value) || 0;
+
+                    if (isInit) {
+                        // First time: Sold = End - Start (Inputted)
+                        let sold1 = Math.max(0, e1 - s1);
+                        let sold2 = Math.max(0, e2 - s2);
+                        sold = sold1 + sold2;
+                        // Stock = Initial Stock (pr) - Sold
+                        ost = pr - sold;
+                    } else {
+                        // Regular: Sold = End - Start (Auto)
+                        let sold1 = Math.max(0, e1 - s1);
+                        let sold2 = Math.max(0, e2 - s2);
+                        sold = sold1 + sold2;
+                        // Stock = LastOst + NewPrixod - Sold
+                        const lastOst = hist.length ? hist[hist.length - 1].ost : 0;
+                        ost = lastOst + pr - sold;
+                    }
+
+                    if (sold > 0 || pr > 0 || isInit) {
+                        const bPrice = DB.conf.prices[f] || 0;
+                        rec = { date: d, user: op, type: f, start: s1 + s2, end: e1 + e2, end1: e1, end2: e2, sold, price: pc, buy_price: bPrice, ost: ost, exps: f === document.querySelector('[data-f]').dataset.f ? ex : [], term: f === document.querySelector('[data-f]').dataset.f ? tr : 0 };
+                        saved = true;
+                        logDetail += `${f}: ${sold}L (1-K: ${e1}, 2-K: ${e2})\n`;
+                    }
+                } else {
+                    s1 = parseFloat(c.querySelector('.s1').value) || 0; e1 = parseFloat(c.querySelector('.e1').value) || 0;
+
+                    if (isInit) {
+                        sold = Math.max(0, e1 - s1);
+                        ost = pr - sold;
+                    } else {
+                        sold = Math.max(0, e1 - s1);
+                        const lastOst = hist.length ? hist[hist.length - 1].ost : 0;
+                        ost = lastOst + pr - sold;
+                    }
+
+                    if (sold > 0 || pr > 0 || isInit) {
+                        const bPrice = DB.conf.prices[f] || 0;
+                        rec = { date: d, user: op, type: f, start: s1, end: e1, sold, price: pc, buy_price: bPrice, ost: ost, exps: f === document.querySelector('[data-f]').dataset.f ? ex : [], term: f === document.querySelector('[data-f]').dataset.f ? tr : 0 };
+                        saved = true;
+                        logDetail += `${f}: ${sold}L (K: ${e1})\n`;
+                    }
+                }
+                if (rec.type) {
+                    DB.data.push(rec);
+                    // Update Pistol Usage
+                    if (!DB.pistol_usage[rec.type]) DB.pistol_usage[rec.type] = 0;
+                    DB.pistol_usage[rec.type] += rec.sold;
+                }
+            });
+
+            if (saved) {
+                saveData();
+                logAction("Hisoblagich kiritdi", logDetail);
+                alert("Muvaffaqiyatli saqlandi!");
+                location.reload();
+            } else alert("Ma'lumot kiritilmadi!");
+        }
+
+        // --- MOLIYA VA TAHLIL ---
+        function initConf() {
+            const c = document.getElementById('cost_inputs'); c.innerHTML = '';
+            ["AI-91", "AI-92", "DIZEL", "PROPAN"].forEach(f => { c.innerHTML += `<div style="margin-bottom:10px"><label>${f} Tannarxi (Xarid)</label><input type="number" id="c_${f}" value="${DB.conf.prices[f] || 0}"></div>`; });
+            document.getElementById('fix_cost').value = DB.conf.fix;
+            if (DB.conf.tax === undefined) DB.conf.tax = 28; // Boshlang'ich 28%
+            c.innerHTML += `<div style="margin-top:20px; border-top:1px solid #eee; padding-top:10px"><label>Soliq Stavkamiz (%)</label><input type="number" id="conf_tax" value="${DB.conf.tax}"></div>`;
+        }
+        function saveConf() {
+            ["AI-91", "AI-92", "DIZEL", "PROPAN"].forEach(f => {
+                DB.conf.prices[f] = parseFloat(document.getElementById(`c_${f}`).value) || 0;
+            });
+            DB.conf.fix = parseFloat(document.getElementById('fix_cost').value) || 0;
+            DB.conf.tax = parseFloat(document.getElementById('conf_tax').value) || 0;
+            saveData(); logAction("Sozlamalar", "Tannarx va xarajatlar o'zgartirildi"); alert("Saqlandi!"); calcFin();
+        }
+        function calcFin() {
+            const f = document.getElementById('f_from').value; const t = document.getElementById('f_to').value;
+            const all = [...DB.all.BUXORO, ...DB.all.QORAKUL].filter(r => r.date >= f && r.date <= t);
+            let rev = 0, cst = 0, exp = 0, prod = {};
+
+            all.forEach(r => {
+                const s = r.sold || 0; const p = r.price || 0;
+                // Use historical buy price if available, else current config
+                const b = r.buy_price !== undefined ? r.buy_price : (DB.conf.prices[r.type] || 0);
+                const e = (r.exps || []).reduce((x, y) => x + y.sum, 0);
+
+                rev += s * p; cst += s * b; exp += e;
+                if (!prod[r.type]) prod[r.type] = 0; prod[r.type] += (s * p) - (s * b);
+            });
+
+            const days = (new Date(t) - new Date(f)) / (86400000) + 1;
+            const fixedExp = (DB.conf.fix / 30) * days;
+            const totalExp = exp + fixedExp;
+
+            const grossProfit = rev - cst;
+            const taxableIncome = grossProfit - totalExp;
+
+            const taxRate = DB.conf.tax || 0;
+            const taxAmount = taxableIncome > 0 ? (taxableIncome * (taxRate / 100)) : 0;
+            const netProfit = taxableIncome - taxAmount;
+
+            document.getElementById('fin_rev').innerText = rev.toLocaleString();
+            document.getElementById('fin_exp').innerText = totalExp.toLocaleString('en-US', { maximumFractionDigits: 0 });
+            // Update labels to show logic
+            // We need to inject HTML for detailed breakdown
+            let detBox = document.getElementById('fin_details_box');
+            if (!detBox) {
+                // Create container if not exists (quick hack, ideally in HTML)
+                const d = document.createElement('div'); d.id = 'fin_details_box';
+                d.style.cssText = "background:var(--bg-body); padding:15px; border-radius:12px; margin-top:20px; font-size:14px";
+                document.querySelector('#fin_net').parentElement.parentElement.after(d);
+                detBox = d; // Assign the newly created element
+            }
+
+            const box = detBox; // Use detBox which is guaranteed to exist now
+            box.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>Jami Savdo (Tushum):</span> <b>${rev.toLocaleString()}</b></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>Tannarx (Benzin o'zi):</span> <b>-${cst.toLocaleString()}</b></div>
+                <div style="border-top:1px dashed var(--border); margin:5px 0"></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>Yalpi Foyda (Marja):</span> <b style="color:var(--primary)">${grossProfit.toLocaleString()}</b></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>Xarajatlar (Doimiy+Kunlik):</span> <b>-${totalExp.toLocaleString(undefined, { maximumFractionDigits: 0 })}</b></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>Soliq (${taxRate}%):</span> <b style="color:var(--danger)">-${taxAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</b></div>
+                <div style="border-top:2px solid var(--border); margin:5px 0"></div>
+                <div style="display:flex; justify-content:space-between; font-size:18px"><span>SAF FOYDA:</span> <b style="color:var(--accent)">${netProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</b></div>
+            `;
+
+            // Asl oddiy kartalarni yashirish?
+            // Yaxshi 'fin_net' ni Sof Foydani ko'rsatishga o'zgartir
+            document.getElementById('fin_net').innerText = netProfit.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+            // Grafikalar
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            if (charts.pie) charts.pie.destroy();
+            charts.pie = new Chart(ctx, { type: 'doughnut', data: { labels: Object.keys(prod), datasets: [{ data: Object.values(prod), backgroundColor: ['#6366f1', '#10b981', '#ef4444', '#f59e0b'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
+            // To'g'ri grafikasi Kunlik Sof Foyda va Xarajat
+            // Sana bo'yicha jamlab chiqish
+            const daily = {}; // { date: { net: 0, exp: 0 } }
+            all.forEach(r => {
+                if (!daily[r.date]) daily[r.date] = { net: 0, exp: 0 };
+                const s = r.sold || 0; const p = r.price || 0; const b = r.buy_price !== undefined ? r.buy_price : (DB.conf.prices[r.type] || 0);
+                const e = (r.exps || []).reduce((x, y) => x + y.sum, 0);
+                const gross = (s * p) - (s * b);
+                daily[r.date].net += (gross - e); // Soliqsiz taxminiy
+                daily[r.date].exp += e;
+            });
+
+            // Kanvas yaratish agar yo'q
+            let barCtx = document.getElementById('barChart');
+            if (!barCtx) {
+                const cv = document.createElement('canvas'); cv.id = 'barChart'; cv.style.height = '200px'; cv.style.marginTop = '20px';
+                document.getElementById('pieChart').parentElement.after(cv);
+                barCtx = cv;
+            }
+
+            if (charts.bar) charts.bar.destroy();
+            charts.bar = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(daily).sort(),
+                    datasets: [
+                        { label: 'Sof Foyda (Soliqsiz)', data: Object.keys(daily).sort().map(d => daily[d].net), backgroundColor: '#10b981' },
+                        { label: 'Xarajat', data: Object.keys(daily).sort().map(d => daily[d].exp), backgroundColor: '#ef4444' }
+                    ]
+                },
+                options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } } }
+            });
+        }
+
+        function exportFinPDF() {
+            const f = document.getElementById('f_from').value; const t = document.getElementById('f_to').value;
+            const detBox = document.getElementById('fin_details_box').innerHTML;
+            const rev = document.getElementById('fin_rev').innerText;
+            const exp = document.getElementById('fin_exp').innerText;
+            const net = document.getElementById('fin_net').innerText;
+
+            const bg = getComputedStyle(document.body).backgroundColor;
+            const txt = getComputedStyle(document.body).color;
+            const brd = getComputedStyle(document.body).getPropertyValue('--border');
+
+            let html = `<div style="padding:20px; font-family:sans-serif; background:${bg}; color:${txt}">
+                <h2 style="text-align:center">MOLIYA HISOBOTI: ${f} dan ${t} gacha</h2>
+                <p style="text-align:center; opacity:0.7; font-size:12px">Generatsiya: ${new Date().toLocaleString()}</p>
+                
+                <div style="margin-top:20px; padding:15px; border:1px solid ${brd}; border-radius:12px">
+                    ${detBox}
+                </div>
+                
+                <div style="margin-top:30px; text-align:center; font-size:10px; color:gray">
+                    AYQSH HISOBOT TIZIMI v2.0
+                </div>
+            </div>`;
+
+            const opt = {
+                margin: 10,
+                filename: `MOLIYA_${f}_${t}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: bg },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(html).save();
+        }
+
+        // --- XARAJATLAR ---
+        function initExp() {
+            const s = document.getElementById('ex_cat'); s.innerHTML = '<option value="all">Barchasi</option>';
+            const st = new Set(); DB.data.forEach(r => (r.exps || []).forEach(e => st.add(e.why)));
+            st.forEach(v => s.innerHTML += `<option>${v}</option>`);
+        }
+        function renderExp() {
+            const f = document.getElementById('ex_from').value; const t = document.getElementById('ex_to').value; const c = document.getElementById('ex_cat').value;
+            let tot = 0, h = '';
+            DB.data.filter(r => r.date >= f && r.date <= t).forEach(r => {
+                (r.exps || []).forEach(e => {
+                    if (c === 'all' || e.why === c) { tot += e.sum; h += `<tr><td>${r.date}</td><td>${e.why}</td><td style="color:var(--danger); font-weight:700">${e.sum.toLocaleString()}</td><td>${r.user}</td></tr>`; }
+                });
+            });
+            document.querySelector('#tbl_exp tbody').innerHTML = h; document.getElementById('ex_total').innerText = tot.toLocaleString();
+        }
+
+        // --- ARXIV ---
+        function renderArch() {
+            const f = document.getElementById('ar_from').value; const t = document.getElementById('ar_to').value;
+            let h = '';
+
+            const recs = DB.data.map((r, i) => ({ ...r, i })).filter(r => r.date >= f && r.date <= t).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Summary vars
+            let totrev = 0, totexp = 0, totterm = 0, totlit = {};
+            let expList = [];
+
+            recs.forEach(r => {
+                const s = r.sold * r.price; const e = (r.exps || []).reduce((a, b) => a + b.sum, 0); const trm = r.term || 0;
+
+                totrev += s; totexp += e; totterm += trm;
+                if (!totlit[r.type]) totlit[r.type] = 0; totlit[r.type] += r.sold;
+
+                (r.exps || []).forEach(ex => expList.push({ date: r.date, why: ex.why, sum: ex.sum }));
+
+                if (r.isPriyom) {
+                    h += `<tr style="background:var(--accent); opacity:0.1"><td>${r.date}</td><td><span class="badge" style="background:var(--accent); color:white">PRIYOM</span></td><td><b>${r.type}</b></td><td colspan="3">Haydovchi: ${r.priyomDetails.driver} | Yuk: ${r.priyomDetails.truck}</td><td>${r.ost.toFixed(1)}</td><td><button class="btn-outline" style="padding:6px 12px" onclick="edit(${r.i})">✏️</button></td></tr>`;
+                } else {
+                    h += `<tr><td>${r.date}</td><td><span class="badge" style="background:var(--border)">${r.type}</span></td><td><b>${Math.round(r.sold)}</b></td><td>${r.price}</td><td>${s.toLocaleString()}</td><td style="color:var(--danger)">${e.toLocaleString()}</td><td>${r.ost.toFixed(1)}</td><td><button class="btn-outline" style="padding:6px 12px" onclick="edit(${r.i})">✏️</button></td></tr>`;
+                }
+            });
+            document.querySelector('#tbl_arch tbody').innerHTML = h;
+
+            // Render Summary
+            const net = totrev - totexp - totterm;
+            let sumHTML = `<div class="grid-2" style="margin-bottom:20px">
+                <div style="background:var(--bg-body); padding:15px; border-radius:12px; border:1px solid var(--border)">
+                    <label>Jami Savdo</label><div class="big-num" style="color:var(--primary)">${totrev.toLocaleString()}</div>
+                </div>
+                 <div style="background:var(--bg-body); padding:15px; border-radius:12px; border:1px solid var(--border)">
+                    <label>Naqd Pul</label><div class="big-num" style="color:var(--accent)">${net.toLocaleString()}</div>
+                </div>
+                <div style="background:var(--bg-body); padding:15px; border-radius:12px; border:1px solid var(--border)">
+                    <label>Terminal</label><div class="big-num" style="color:var(--warning)">${totterm.toLocaleString()}</div>
+                </div>
+                 <div style="background:var(--bg-body); padding:15px; border-radius:12px; border:1px solid var(--border)">
+                    <label>Xarajatlar</label><div class="big-num" style="color:var(--danger)">${totexp.toLocaleString()}</div>
+                    <button class="btn-outline" style="margin-top:5px; font-size:11px; padding:5px" onclick="toggleExpList()">Batafsil ko'rish</button>
+                </div>
+            </div>`;
+
+            sumHTML += `<div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:10px">`;
+            for (let k in totlit) {
+                sumHTML += `<div style="background:var(--bg-body); padding:10px; border-radius:8px; border:1px solid var(--border); min-width:100px text-align:center">
+                    <label>${k}</label><div style="font-weight:700; font-size:16px">${Math.round(totlit[k]).toLocaleString()} L</div>
+                </div>`;
+            }
+            sumHTML += `</div>`;
+
+            document.getElementById('arch_summary').innerHTML = sumHTML;
+
+            // Render Exp List
+            let exH = '';
+            expList.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(e => {
+                exH += `<tr><td>${e.date}</td><td>${e.why}</td><td>${e.sum.toLocaleString()}</td></tr>`;
+            });
+            document.querySelector('#tbl_arch_exp tbody').innerHTML = exH;
+        }
+
+        function toggleExpList() {
+            const b = document.getElementById('arch_expenses_box');
+            b.style.display = b.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function edit(i) {
+            if (prompt("DIQQAT! Tahrirlash uchun maxsus parol:") !== "ZARIPOV2011$") return alert("Parol noto'g'ri!");
+            editId = i; const r = DB.data[i];
+            document.getElementById('e_date').value = r.date; document.getElementById('e_type').value = r.type;
+            document.getElementById('e_start').value = r.start; document.getElementById('e_sold').value = r.sold;
+            document.getElementById('e_end').value = r.end; document.getElementById('e_price').value = r.price;
+            document.getElementById('e_exp').value = (r.exps || []).reduce((a, b) => a + b.sum, 0);
+            document.getElementById('edit_overlay').classList.add('show');
+        }
+        function recalcEdit() {
+            document.getElementById('e_end').value = (parseFloat(document.getElementById('e_start').value) || 0) + (parseFloat(document.getElementById('e_sold').value) || 0);
+        }
+        function saveEdit() {
+            const r = DB.data[editId]; const ns = parseFloat(document.getElementById('e_sold').value) || 0;
+            const diff = ns - r.sold; r.sold = ns; r.end = r.start + ns; r.price = parseFloat(document.getElementById('e_price').value) || 0; r.ost -= diff;
+            const ne = parseFloat(document.getElementById('e_exp').value) || 0; r.exps = ne > 0 ? [{ sum: ne, why: "Tahrir" }] : [];
+            saveData();
+            logAction("Tahrirladi", `${r.date} dagi ${r.type}. Sotuv: ${ns} ga o'zgardi`);
+            document.getElementById('edit_overlay').classList.remove('show'); renderArch();
+        }
+
+        // --- VAZIFALAR ---
+        function renderTasks() {
+            const d = document.getElementById('task_list'); d.innerHTML = '';
+            const cnt = DB.tasks.filter(t => !t.done).length;
+            const b = document.getElementById('task_cnt'); b.innerText = cnt; b.style.display = cnt ? 'inline-block' : 'none';
+            DB.tasks.forEach((t, i) => {
+                d.innerHTML += `<div class="task-item ${t.done ? 'done' : ''}" style="padding:10px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; opacity:${t.done ? 0.5 : 1}"><span>${t.txt}</span> <button class="btn-check" style="width:auto; padding:5px" onclick="doneTask(${i})">✓</button></div>`;
+            });
+        }
+        function addTask() { const t = document.getElementById('task_txt').value; if (t) { DB.tasks.unshift({ txt: t, done: false }); saveData(); renderTasks(); document.getElementById('task_txt').value = ''; } }
+        function doneTask(i) { DB.tasks[i].done = true; saveData(); renderTasks(); logAction("Vazifa", "Bajarildi: " + DB.tasks[i].txt); }
+
+        // --- PRIYOM VA LOGIKA ---
+        function togglePriyom() {
+            const b = document.getElementById('priyom_box');
+            b.style.display = b.style.display === 'none' ? 'block' : 'none';
+        }
+        function savePriyom() {
+            if (DB.locks.main) return alert("Bloklangan!");
+            const t = document.getElementById('p_type').value; const l = parseFloat(document.getElementById('p_litr').value) || 0;
+            if (l > 0) {
+                const fuelHist = DB.data.filter(r => r.type === t);
+                const lastOst = fuelHist.length ? fuelHist[fuelHist.length - 1].ost : 0;
+
+                const actual = l; // No loss
+                const newOst = lastOst + actual;
+
+                const det = { truck: document.getElementById('p_truck').value, driver: document.getElementById('p_driver').value, temp: document.getElementById('p_temp').value, seal: document.getElementById('p_seal').value, loss: 0, amount: l };
+
+                DB.data.push({ date: new Date().toISOString().split('T')[0], user: currentUser ? currentUser.u : 'ADMIN', type: t, start: 0, end: 0, sold: 0, price: 0, ost: newOst, isPriyom: true, priyomDetails: det });
+
+                saveData();
+                logAction("Priyom", `${t}: ${l}L keldi.`);
+                alert("Yuk qabul qilindi!");
+                location.reload();
+            } else alert("Litr kiriting!");
+        }
+
+        // --- TELEGRAM VA ZAXIRALASH ---
+        function tgExport() {
+            const d = new Date().toISOString().split('T')[0];
+            const rec = DB.data.filter(r => r.date === d && !r.isPriyom);
+            if (!rec.length) return alert("Bugun savdo yo'q!");
+            let txt = `📅 *${d} KUNLIK HISOBOT*\n------------------\n`;
+            let tot = 0, exp = 0, term = 0;
+            rec.forEach(r => {
+                const s = r.sold * r.price; tot += s;
+                txt += `⛽ ${r.type}: ${r.sold.toLocaleString()}L (${s.toLocaleString()})\n`;
+                (r.exps || []).forEach(e => { exp += e.sum; });
+                term += (r.term || 0);
+            });
+            txt += `------------------\n💵 TUSHUM: ${tot.toLocaleString()} so'm\n💳 TERMINAL: ${term.toLocaleString()} so'm\n💸 XARAJAT: ${exp.toLocaleString()} so'm\n💰 NAQD: ${(tot - exp - term).toLocaleString()} so'm`;
+            navigator.clipboard.writeText(txt).then(() => alert("Nusxalandi! Telegramga tashlang."));
+        }
+
+        function showPDFModal() { document.getElementById('pdf_modal').classList.add('show'); }
+
+        function exportPDF(orientation) {
+            document.getElementById('pdf_modal').classList.remove('show');
+            const f = document.getElementById('ar_from').value; const t = document.getElementById('ar_to').value;
+            const recs = DB.data.filter(r => r.date >= f && r.date <= t && !r.isPriyom);
+            if (!recs.length) return alert("Tanlangan sanada ma'lumot yo'q!");
+
+            const bg = getComputedStyle(document.body).backgroundColor;
+            const txt = getComputedStyle(document.body).color;
+            const brd = getComputedStyle(document.body).getPropertyValue('--border');
+
+            let html = `<div style="padding:20px; font-family:sans-serif; background:${bg}; color:${txt}">
+                <h2 style="text-align:center">HISOBOT: ${f} dan ${t} gacha</h2>
+                <p style="text-align:center; opacity:0.7; font-size:12px">Yaratilgan vaqt: ${new Date().toLocaleString()}</p>
+                
+                <!-- SUMMARY -->
+                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; border-bottom:1px dashed ${brd}; padding-bottom:15px">`;
+
+            let totSold = 0, totRev = 0, totTerm = 0, totExp = 0, totLit = {};
+            recs.forEach(r => {
+                const s = r.sold * r.price; const ex = (r.exps || []).reduce((a, b) => a + b.sum, 0); const trm = r.term || 0;
+                totSold += r.sold; totRev += s; totTerm += trm; totExp += ex;
+                if (!totLit[r.type]) totLit[r.type] = 0; totLit[r.type] += r.sold;
+            });
+            const net = totRev - totExp - totTerm;
+
+            html += `
+                <div style="flex:1; border:1px solid ${brd}; padding:10px; border-radius:8px"><b>Jami Savdo:</b><br>${totRev.toLocaleString()}</div>
+                <div style="flex:1; border:1px solid ${brd}; padding:10px; border-radius:8px"><b>Naqd Pul:</b><br>${net.toLocaleString()}</div>
+                <div style="flex:1; border:1px solid ${brd}; padding:10px; border-radius:8px"><b>Terminal:</b><br>${totTerm.toLocaleString()}</div>
+                <div style="flex:1; border:1px solid ${brd}; padding:10px; border-radius:8px"><b>Xarajat:</b><br>${totExp.toLocaleString()}</div>
+            </div>`;
+
+            html += `<table style="width:100%; border-collapse:collapse; margin-top:20px; font-size:12px; color:${txt}">
+                <tr style="background:rgba(128,128,128,0.1)">
+                    <th style="border:1px solid ${brd}; padding:8px">Sana</th>
+                    <th style="border:1px solid ${brd}; padding:8px">Mahsulot</th>
+                    <th style="border:1px solid ${brd}; padding:8px">Sotuv (L)</th>
+                    <th style="border:1px solid ${brd}; padding:8px">Narx</th>
+                    <th style="border:1px solid ${brd}; padding:8px">Jami Savdo</th>
+                    <th style="border:1px solid ${brd}; padding:8px">Terminal</th>
+                    <th style="border:1px solid ${brd}; padding:8px">Xarajat</th>
+                </tr>`;
+
+            recs.forEach(r => {
+                const s = r.sold * r.price; const ex = (r.exps || []).reduce((a, b) => a + b.sum, 0); const trm = r.term || 0;
+                html += `<tr>
+                    <td style="border:1px solid ${brd}; padding:5px">${r.date}</td>
+                    <td style="border:1px solid ${brd}; padding:5px">${r.type}</td>
+                    <td style="border:1px solid ${brd}; padding:5px">${Math.round(r.sold)}</td>
+                    <td style="border:1px solid ${brd}; padding:5px">${r.price}</td>
+                    <td style="border:1px solid ${brd}; padding:5px">${s.toLocaleString()}</td>
+                    <td style="border:1px solid ${brd}; padding:5px">${trm.toLocaleString()}</td>
+                    <td style="border:1px solid ${brd}; padding:5px">${ex.toLocaleString()} <br> <span style="font-size:9px; opacity:0.7">${(r.exps || []).map(e => e.why).join(', ')}</span></td>
+                </tr>`;
+            });
+
+            html += `</table>`;
+
+            // DETAILS EXP
+            let allExps = []; recs.forEach(r => (r.exps || []).forEach(e => allExps.push({ d: r.date, w: e.why, s: e.sum })));
+            if (allExps.length > 0) {
+                html += `<h3 style="margin-top:20px; font-size:14px">Xarajatlar Tafsiloti</h3><ul style="font-size:12px">`;
+                allExps.forEach(e => html += `<li>${e.d}: ${e.w} - ${e.s.toLocaleString()}</li>`);
+                html += `</ul>`;
+            }
+
+            // Stock
+            html += `<h3 style="margin-top:20px; font-size:14px">Oxirgi Qoldiqlar (${t} holatiga)</h3>
+            <table style="width:100%; border-collapse:collapse; font-size:12px; color:${txt}">
+            <tr style="background:rgba(128,128,128,0.1)"><th style="border:1px solid ${brd}; padding:8px">Mahsulot</th><th style="border:1px solid ${brd}; padding:8px">Qoldiq (L)</th></tr>`;
+
+            ["AI-91", "AI-92", "DIZEL", "PROPAN"].forEach(f => {
+                const hist = DB.data.filter(r => r.type === f && r.date <= t);
+                const last = hist.length ? hist[hist.length - 1].ost : 0;
+                html += `<tr><td style="border:1px solid ${brd}; padding:5px">${f}</td><td style="border:1px solid ${brd}; padding:5px">${last.toFixed(0)}</td></tr>`;
+            });
+            html += `</table></div>`;
+
+            const opt = {
+                margin: 10,
+                filename: `HISOBOT_${f}_${t}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: bg },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: orientation }
+            };
+            html2pdf().set(opt).from(html).save();
+        }
+        function backupDB() {
+            const d = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DB));
+            const a = document.createElement('a'); a.href = d; a.download = `AYQSH_BACKUP_${new Date().toISOString().split('T')[0]}.json`; a.click();
+        }
+        function restoreDB(input) {
+            const r = new FileReader();
+            r.onload = (e) => { if (confirm("Baza tiklansinmi? Hozirgi ma'lumotlar o'chib ketadi!")) { const n = JSON.parse(e.target.result); localStorage.clear(); for (let k in n) localStorage.setItem(k, JSON.stringify(n[k])); location.reload(); } };
+            r.readAsText(input.files[0]);
+        }
+
+        // --- PISTOL LIMITS ADMIN ---
+        function savePistolLimits() {
+            ["AI-91", "AI-92", "DIZEL", "PROPAN"].forEach(f => {
+                DB.pistol_limits[f] = parseFloat(document.getElementById(`plim_${f}`).value) || 10000;
+            });
+            saveData(); alert("Limitlar saqlandi!");
+        }
+
+
+        // --- ADMIN PANELI ---
+        function renderAdmin() {
+            document.getElementById('op1_val').value = DB.ops.op1; document.getElementById('op2_val').value = DB.ops.op2;
+
+            // Pistol Limits
+            const pl = document.getElementById('pistol_limits_div'); pl.innerHTML = '';
+            ["AI-91", "AI-92", "DIZEL", "PROPAN"].forEach(f => {
+                const lim = DB.pistol_limits ? (DB.pistol_limits[f] || 0) : 0;
+                const use = DB.pistol_usage ? (DB.pistol_usage[f] || 0) : 0;
+                const rem = lim - use;
+                pl.innerHTML += `<div class="grid-2" style="margin-bottom:5px">
+                    <div><label>${f} Limiti</label><input type="number" id="pl_${f}" value="${lim}"></div>
+                    <div><label>Ishlatildi (Qoldiq: ${rem})</label><input type="number" value="${use}" readonly class="readonly"></div>
+                </div>`;
+            });
+
+            // Add buttons for saving limits if not exists
+            if (!document.getElementById('btn_save_lim')) {
+                pl.insertAdjacentHTML('afterend', `
+                    <button id="btn_save_lim" class="btn-outline" style="margin-top:10px" onclick="savePistolLimits()">💾 Limitlarni Saqlash</button>
+                    <button class="btn-outline" style="margin-top:10px; color:var(--danger); border-color:var(--danger)" onclick="resetPistolUsage()">🗑️ Hisoblagichlarni Nolga Tushirish</button>
+                `);
+            }
+
+            updLock();
+        }
+
+        function savePistolLimits() {
+            ["AI-91", "AI-92", "DIZEL", "PROPAN"].forEach(f => {
+                DB.pistol_limits[f] = parseFloat(document.getElementById(`pl_${f}`).value) || 0;
+            });
+            saveData(); alert("Limitlar saqlandi!"); renderAdmin();
+        }
+
+        function resetPistolUsage() {
+            if (confirm("DIQQAT! Barcha pistol ishlovini 0 ga tushirasizmi?")) {
+                DB.pistol_usage = {}; saveData(); renderAdmin(); alert("Tozalandi!");
+            }
+        }
+
+        function updLock() {
+            ['plomba', 'start', 'main'].forEach(k => {
+                const l = DB.locks[k];
+                const on = document.getElementById(k === 'plomba' ? 'l_pl_on' : k === 'start' ? 'l_st_on' : 'l_mn_on');
+                const off = document.getElementById(k === 'plomba' ? 'l_pl_off' : k === 'start' ? 'l_st_off' : 'l_mn_off');
+                if (l) { on.classList.add('active', 'lock'); off.classList.remove('active', 'unlock'); }
+                else { on.classList.remove('active', 'lock'); off.classList.add('active', 'unlock'); }
+            });
+        }
+        function togLock(k, v) { DB.locks[k] = v; saveData(); updLock(); logAction("Bloklash", `${k} ${v ? "Yopildi" : "Ochildi"}`); }
+        function saveOps() { DB.ops.op1 = document.getElementById('op1_val').value; DB.ops.op2 = document.getElementById('op2_val').value; saveData(); alert("Saqlandi"); }
+        function sysReset() {
+            if (prompt("DIQQAT! Butun tizimni tozalash uchun maxsus parol:") === "ZARIPOV2011$") {
+                logAction("RESET", "Tizim butunlay tozalandi");
+                localStorage.clear(); location.reload();
+            }
+            else alert("Parol noto'g'ri!");
+        }
+
+        // --- YANGI SAHIFALAR CHIQARISH ---
+        function renderHistory() {
+            const f = document.getElementById('hist_from').value;
+            const t = document.getElementById('hist_to').value;
+            const tbody = document.querySelector('#tbl_history tbody'); tbody.innerHTML = '';
+
+            // Filter logs with dateStr
+            const filtered = DB.logs.filter(l => l.dateStr && l.dateStr >= f && l.dateStr <= t);
+
+            filtered.forEach(l => {
+                tbody.innerHTML += `<tr><td>${l.time}</td><td><b>${l.user}</b></td><td>${l.action}</td><td style="font-size:11px; color:var(--text-muted)">${l.details}</td></tr>`;
+            });
+        }
+
+        function renderSupply() {
+            const f = document.getElementById('sup_from').value;
+            const t = document.getElementById('sup_to').value;
+            const tbody = document.querySelector('#tbl_supply tbody'); tbody.innerHTML = '';
+
+            DB.data.filter(r => r.isPriyom && r.date >= f && r.date <= t).forEach(r => {
+                const d = r.priyomDetails || {};
+                // Fallback for old records: if amount missing, estimate from loss (0.01% logic)
+                const amount = d.amount || (d.loss ? (d.loss / 0.0001) : 0);
+                const actual = amount ? (amount - (d.loss || 0)) : 0;
+
+                tbody.innerHTML += `<tr><td>${r.date}</td><td><b>${r.type}</b></td><td>${amount ? amount.toLocaleString() : '-'}</td><td style="color:var(--danger)">${(d.loss || 0).toFixed(2)}</td><td>${actual.toLocaleString()}</td><td>${d.truck} / ${d.driver}</td></tr>`;
+            });
+        }
+    </script>
+</body>
+
+</html>
